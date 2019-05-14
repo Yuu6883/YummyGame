@@ -1,0 +1,81 @@
+#chat{
+    background: #000;
+    border: 0;
+    color: #fff;
+    font-size: 15px;
+    height: 38px;
+    padding-left: 10px;
+    width: 380px;
+    display: block;
+    bottom: 10%;
+}
+::-webkit-scrollbar {
+    width: 0px;
+}
+#chatArea{
+    position: absolute;
+    bottom: 30px;
+    right: 40%;
+    display: none;
+}
+#chatRoom{
+    background: rgba(24, 24, 24, 0.788);
+    font-size: 12px;
+    padding: 10px;
+    position: absolute;
+    width: 25%;
+    border-radius: 2px;
+    height: 40%;
+    left: 20px; 
+    bottom: 30px;
+    display: none;
+}
+#playerName{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.msg{
+    color:white;
+}
+html, body {
+    -moz-user-select:none;
+    -webkit-user-select:none;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+}
+.discord-color{
+    color: #7289da
+}
+.google-color1{
+    color: #1DA462
+}
+.google-color2{
+    color: #DD5144
+}
+.google-color3{
+    color: #FFC046
+}
+.google-color4{
+    color: #4C88F5
+}
+.facebook-color{
+    color: rgb(59, 89, 152)
+}
+.guest-color{
+    color: orange
+}
+.font-md{
+    font-size: 30px
+}
+.login-buttons{
+    width: 100px;
+    height: 100px;
+}
+.pfp{
+    height: 200px;
+    width: 200px;
+}
+#remember{
+    font-weight: 500;
+}
