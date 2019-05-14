@@ -1019,7 +1019,7 @@ module.exports = class SocketManager {
         this.send(ToBuffer(NetEventCode.PING));
     }
 }
-},{"../../bufferUtil":1,"../server/netEvent":10}],10:[function(require,module,exports){
+},{"../bufferUtil":1,"../server/netEvent":10}],10:[function(require,module,exports){
 const DELTA_FLAG = 10;
 const GRID_FLAG = 1;
 const OFFSET_GRID_FLAG = 4;
