@@ -215,6 +215,11 @@ module.exports = class Game extends EventEmitter{
             data.grid = this.board.map(row => row.map(cell => cell.background_pid));
             data.size = this.size;
             data.tick = this.game_tick;
+            data.tails = this.connected.reduce((prev, curr) => {
+                if (curr.tails.length) prev[curr.pid] = curr.tails.slice(0, -1);
+                return prev;
+            }, {});
+            if (!Object.keys(data.tails).length) delete data.tails;
         } else {
             let dim = this.getDeltaDimension();
 

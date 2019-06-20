@@ -51,7 +51,7 @@ class Renderer{
         $(window).on("stop", () => this.stop());
         $(window).on("gameData",
         /**
-         * @param {{time: Number, mypid: Number, delta: Number[][][], arrayGrid: Number[][], offsetGrid: {grid_offset: Number[], dim: Number[], grid_array: Number[]}, gridInfo: {grid: Number[][], size: number, tick: number}, killed: [][], stats: number[]}} data
+         * @param {{time: Number, mypid: Number, delta: Number[][][], arrayGrid: Number[][], offsetGrid: {grid_offset: Number[], dim: Number[], grid_array: Number[]}, gridInfo: {grid: Number[][], size: number, tick: number}, killed: [][], stats: number[], tails: [][][]}} data
          */
         (event, data) => {
             this.idleTime = 0;
@@ -65,6 +65,9 @@ class Renderer{
                 this.grid = data.gridInfo.grid;
                 this.size = data.gridInfo.size;
                 this.tick = data.gridInfo.tick;
+                for (let pid in data.tails) {
+                    this.players[pid].tails = data.tails[pid];
+                }
                 $(window).trigger("gameTick", this.tick);
             }
             if (data.delta) {

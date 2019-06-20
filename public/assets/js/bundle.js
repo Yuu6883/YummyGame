@@ -670,7 +670,7 @@ class Renderer{
         $(window).on("stop", () => this.stop());
         $(window).on("gameData",
         /**
-         * @param {{time: Number, mypid: Number, delta: Number[][][], arrayGrid: Number[][], offsetGrid: {grid_offset: Number[], dim: Number[], grid_array: Number[]}, gridInfo: {grid: Number[][], size: number, tick: number}, killed: [][], stats: number[]}} data
+         * @param {{time: Number, mypid: Number, delta: Number[][][], arrayGrid: Number[][], offsetGrid: {grid_offset: Number[], dim: Number[], grid_array: Number[]}, gridInfo: {grid: Number[][], size: number, tick: number}, killed: [][], stats: number[], tails: [][][]}} data
          */
         (event, data) => {
             this.idleTime = 0;
@@ -684,6 +684,9 @@ class Renderer{
                 this.grid = data.gridInfo.grid;
                 this.size = data.gridInfo.size;
                 this.tick = data.gridInfo.tick;
+                for (let pid in data.tails) {
+                    this.players[pid].tails = data.tails[pid];
+                }
                 $(window).trigger("gameTick", this.tick);
             }
             if (data.delta) {
@@ -1022,6 +1025,7 @@ module.exports = class SocketManager {
 },{"../bufferUtil":1,"../server/netEvent":10}],10:[function(require,module,exports){
 const DELTA_FLAG = 10;
 const GRID_FLAG = 1;
+const ALL_TAILS_FLAG = 7;
 const OFFSET_GRID_FLAG = 4;
 const KILL_FLAG = 6;
 const ARRAY_GRID_FLAG = 2;
@@ -1168,6 +1172,63 @@ class GridData extends NetData{
             let row = [];
             for (let j = 0; j < s; j++) row.push(view.getUint8(offset++));
             decoded.grid.push(row);
+        }
+        console.assert(offset === target);
+        return decoded;
+    }
+}
+
+class TailsData extends NetData {
+    /** @param {[][]} tails */
+    constructor(tails) {
+        let size = 0;
+        for (let tail of Object.values(tails)) {
+            size += tail.length;
+        }
+        super(4 * size + 3 * Object.keys(tails).length, ALL_TAILS_FLAG);
+        this.tails = tails;
+    }
+
+    /**
+     * @param {Number} offset 
+     * @param {DataView} view
+     */
+    write(offset, view) {
+        offset = super.write(offset, view);
+        for (let pid in this.tails) {
+            view.setUint8(offset++, ~~pid);
+            let tail = this.tails[pid];
+            tail.forEach(coord =>{
+                view.setUint16(offset, coord[0]);
+                offset += 2;
+                view.setUint16(offset, coord[1]);
+                offset += 2;
+            });
+            view.setUint16(offset, -1);
+            offset += 2;
+        }
+        return offset;
+    }
+
+    /**
+     * @param {Number} offset 
+     * @param {DataView} view 
+     * @returns {Number[][][]}
+     */
+    static decode(offset, size, view) {
+        let target = offset + size;
+        let decoded = {};
+        while (offset < target) {
+            let pid = view.getUint8(offset++);
+            let tail = [];
+            let [x, y] = [view.getUint16(offset), view.getUint16(offset + 2)];
+            while (x !== 65535) {
+                tail.push([x, y]);
+                offset += 4;
+                [x, y] = [view.getUint16(offset), view.getUint16(offset + 2)];
+            }
+            offset += 2;
+            decoded[pid] = tail;
         }
         console.assert(offset === target);
         return decoded;
@@ -1464,6 +1525,10 @@ const ReadBuffer = buffer => {
                 parsedArray.arrayGrid = ArrayGridData.decode(offset, size, view);
             break;
 
+            case ALL_TAILS_FLAG:
+                parsedArray.tails = TailsData.decode(offset, size, view);
+            break;
+
             default:
                 console.error("Unknown flag", flag);
         }
@@ -1488,6 +1553,7 @@ module.exports = {
     KillData,
     DeltaData,
     GridData,
+    TailsData,
     OffsetGridData,
     ArrayGridData,
     ErrorCode,
@@ -1499,6 +1565,7 @@ module.exports = {
 // node apps/games/yummy/server/netEvent.js
 
 // let data = [];
+// data.push(new TailsData({'1': [[1, 2], [3, 4]], '2': [[5, 6], [7, 8]]}));
 // data.push(new KillData([[1, 5, 0], [5, 1, 0]]));
 // data.push(new OffsetGridData({offset: [99, 6969], dim: [3, 3], grid: [1, 2, 3, 4, 5, 6, 7, 8, 9]}));
 // data.push(new ArrayGridData([[1, 5, 6], [2, 60, 40], [8, 2993, 9999]]));

@@ -13,7 +13,7 @@ const validServerIDs = (() => {
 
 logger.debug(`Running Yummy Instances: ${validServerIDs.join(", ")}`);
 
-const { NetErrorEvent, NetEventCode ,ArrayGridData ,OffsetGridData ,KillData ,DeltaData, GridData, write } = require("./netEvent");
+const { NetErrorEvent, NetEventCode ,ArrayGridData ,OffsetGridData ,KillData ,DeltaData, GridData, TailsData ,write } = require("./netEvent");
 
 /** @type {Player[]} */
 let connected = [];
@@ -36,6 +36,10 @@ pm2.connect(err => {
     
                 } else if (data.background_delta_grid) {
                     dataArray.push(new OffsetGridData(data.background_delta_grid));
+                }
+
+                if (data.tails) {
+                    dataArray.push(new TailsData(data.tails));
                 }
     
                 if (data.tail_delta) {
@@ -195,7 +199,7 @@ module.exports = class Player{
         data = data || {};
         data.user = this.user;
         data.hash = this.hash;
-        process.send({
+        if (process.send) process.send({
             type: `yummy-${this.serverID}:${message}`,
             data: data
         });
