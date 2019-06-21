@@ -3,13 +3,15 @@ const botdb = require("../../../../database/botdb");
 const logger = require('../../../../util/logger');
 const Player = require("./player");
 
-const loadInfo = async token => {
+const loadInfo = async (token, owner) => {
 
     let dbuser;
     let userinfo;
 
     if (token) {
         dbuser = await db.login(token);
+    } else if (owner) {
+        dbuser = owner;
     }
 
     if (!dbuser) {
@@ -63,7 +65,7 @@ module.exports = async (ws, req) => {
         let result = await botdb.loginBot(bot, botToken, "yummy");
         if (result && result.owner) {
             let owner = await db.get(result.owner);
-            userinfo = loadInfo(undefined, owner);
+            userinfo = await loadInfo(undefined, owner);
             userinfo.name += " Bot";
         } else {
             ws.close(4000, "Invalid Bot Login");

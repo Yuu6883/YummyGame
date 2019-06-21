@@ -112,6 +112,10 @@ module.exports = class Player{
                 socket.close();
                 return;
             }
+            if (!data.byteLength) {
+                logger.warn("Received Empty ArrayBuffer");
+                return;
+            }
             let view = new DataView(data);
             let event = view.getUint16(0);
             logger.debug(`Received event: ${event}, data length: ${view.byteLength - 2} bytes`);
@@ -155,17 +159,16 @@ module.exports = class Player{
                     case NetEventCode.JOIN:
                         let name = ToString(data);
                         this.user.name = (name.slice(0, 16) || this.user.name).trim();
-                        this.serverID = name.slice(16);
+                        this.serverID = name.slice(16).trim();
                         if (!validServerIDs.includes(this.serverID)) {
                             this.disconnect(false, "Unknown Server: " + name);
-                            console.log(validServerIDs);
                             break;
                         }
                         this.sendToGameServer("join");
                         break;
                         
                     default:
-                        logger.log(`Unknown event: ${event}, data length: ${view.byteLength - 2} bytes`);
+                        logger.log(`Unknown event: ${event}, data length: ${view.byteLength} bytes`);
                 }
             } catch(e) {
                 logger.debug(e);

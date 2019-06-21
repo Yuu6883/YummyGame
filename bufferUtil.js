@@ -2,8 +2,8 @@ module.exports = {
     ToString: buf => {
         let arr = [];
         let view = new DataView(buf);
-        for(let i = 2; i < view.byteLength; i += 4) {
-            arr.push(view.getUint32(i));
+        for(let i = 2; i < view.byteLength; i += 2) {
+            arr.push(view.getUint16(i));
         }
         return String.fromCharCode(...arr);
     },
@@ -11,11 +11,11 @@ module.exports = {
         let buf;
         if (typeof(data) == 'string') {
             let str = data;
-            buf = new ArrayBuffer(str.length * 4 + 2);
+            buf = new ArrayBuffer(str.length * 2 + 2);
             let bufView = new DataView(buf);
             bufView.setUint16(0, event);
             for (let i = 0, strLen = str.length; i < strLen; i++) {
-                bufView.setUint32(4 * i + 2, str.charCodeAt(i));
+                bufView.setUint16(2 * i + 2, str.charCodeAt(i));
             }
         } else if (typeof(data) == 'number') {
             buf = new ArrayBuffer(4);

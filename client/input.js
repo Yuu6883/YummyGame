@@ -136,6 +136,7 @@ module.exports = class InputManager{
 
         $(window).on("err", (event, err) => {
             this.err(err);
+            console.error(err);
         });
 
         $(window).on("loginCancel", () => Swal.hideLoading());
@@ -190,10 +191,11 @@ module.exports = class InputManager{
     err(err) {
         return this.show({
             type: "error",
-            title: "Ops...",
-            text: err.message || String(err) || "Unknown Error" + (err.stack || ""),
+            title: err.message || "Ops...",
+            text: String(err) || "Unknown Error" + (err.stack || ""),
             showConfirmButton: false,
             showCancelButton: true,
+            cancelButtonText: "Ok",
             cancelButtonColor: "#d10000"
         }, true);
     }
