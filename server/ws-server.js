@@ -1,4 +1,5 @@
 const db = require("../../../../database/db");
+const botdb = require("../../../../database/botdb");
 const logger = require('../../../../util/logger');
 const Player = require("./player");
 
@@ -45,20 +46,30 @@ const loadInfo = async token => {
 module.exports = async (ws, req) => {
     
     let origin = req.headers.origin;
+    logger.verbose(`Received incoming connection from ${origin}`);
     let token = req.cookies.token;
     let validToken = true;
 
-    // if (!origin.match(/^https?:\/\/alis.io$/)) {
-    //     logger.verbose("Ws connection rejected from " + origin + " Reason: CORS");
-    //     throwError(ws);
-    //     return;
-    // }
+    let bot = req.query.bot;
+    let botToken = req.query.token;
 
     if (!token || !token.match(/^[0-9a-zA-Z]{128}$/)){
         validToken = false;
     }
-    logger.verbose(`Received incoming connection from ${origin}`);
+    
     let userinfo = validToken ? await loadInfo(token): await loadInfo();
+    
+    if (bot && botToken && /^\w{12}$/.test(bot) && /^\w{30}$/.test(botToken)) {
+        let result = await botdb.loginBot(bot, botToken, "yummy");
+        if (result && result.owner) {
+            let owner = await db.get(result.owner);
+            userinfo = loadInfo(undefined, owner);
+            userinfo.name += " Bot";
+        } else {
+            ws.close(4000, "Invalid Bot Login");
+            return;
+        }
+    }
     ws.binaryType = "arraybuffer";
     new Player(ws, userinfo);
 }
