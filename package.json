@@ -1,0 +1,35 @@
+{
+  "name": "yummygame",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "prod": "pm2 start processes/prod.config.js && pm2 flush && pm2 log",
+    "dev": "browserify src/frontend/main.js -o web/assets/js/bundle.js",
+    "bundle": "browserify src/frontend/main.js -o web/assets/js/bundle.js && javascript-obfuscator web/assets/js/bundle.js -o web/assets/js/bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yuu6883/YummyGame.git"
+  },
+  "author": "Yuu6883",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Yuu6883/YummyGame/issues"
+  },
+  "homepage": "https://github.com/Yuu6883/YummyGame#readme",
+  "dependencies": {
+    "@clusterws/cws": "^0.16.0",
+    "btoa": "^1.2.1",
+    "cookie": "^0.4.0",
+    "cookie-parser": "^1.4.4",
+    "express": "^4.17.1",
+    "fb": "^2.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.7.14",
+    "nipplejs": "^0.8.4",
+    "node-fetch": "^2.6.0",
+    "pm2": "^4.2.0",
+    "uid-safe": "^2.1.5"
+  }
+}
