@@ -1,3 +1,6 @@
+# Project Discontinued
+Virgin JS server loool. I don't even remember how to set this thing up again.
+
 # YummyGame
 Open source replica of paper.io (old version)
 
